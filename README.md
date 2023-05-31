@@ -1,4 +1,5 @@
 # 18 NoSQL: Social Network API
+This application is build with Mongo DB to emulate a social network back end
 
 ## Your Task
 
