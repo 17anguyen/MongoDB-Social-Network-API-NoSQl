@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongoose').Types;
-const { Student, Thought } = require('../models');
+const { User, Thought } = require('../models');
 
 module.exports = {
   // Get all users
@@ -8,7 +8,6 @@ module.exports = {
       .then(async (users) => {
         const userObj = {
           users,
-          headCount: await headCount(),
         };
         return res.json(userObj);
       })
@@ -26,7 +25,6 @@ module.exports = {
           ? res.status(404).json({ message: 'No user with that ID' })
           : res.json({
             user,
-            grade: await grade(req.params.userId),
           })
       )
       .catch((err) => {
@@ -34,6 +32,27 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
+
+  // update user
+  updateUser(req, res) {
+    console.log('You are updating user');
+    console.log(req.body);
+    User.findOneAndUpdate(
+      { _id: req.params.userId },
+      req.body,
+      { runValidators: true, new: true }
+    )
+      .then((user) =>
+        !user
+          ? res
+            .status(404)
+            .json({ message: 'No user found with that ID :(' })
+          : res.json(user)
+      )
+      .catch((err) => res.status(500).json(err));
+  },
+
+
   // create a new user
   createUser(req, res) {
     User.create(req.body)
