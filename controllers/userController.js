@@ -1,4 +1,3 @@
-const { ObjectId } = require('mongoose').Types;
 const { User, Thought } = require('../models');
 
 module.exports = {
@@ -17,15 +16,13 @@ module.exports = {
       });
   },
   // Get a single sser
-  getSingleUser(req, res) {
+  getUser(req, res) {
     User.findOne({ _id: req.params.userId })
       .select('-__v')
       .then(async (user) =>
         !user
           ? res.status(404).json({ message: 'No user with that ID' })
-          : res.json({
-            user,
-          })
+          : res.json(user)
       )
       .catch((err) => {
         console.log(err);
@@ -42,15 +39,26 @@ module.exports = {
       req.body,
       { runValidators: true, new: true }
     )
-      .then((user) =>
-        !user
-          ? res
-            .status(404)
-            .json({ message: 'No user found with that ID :(' })
-          : res.json(user)
-      )
-      .catch((err) => res.status(500).json(err));
+      .then((user) => {
+        if (!user) {
+          return res.status(404).json({ message: 'No user with this id!' })
+        }
+        res.json(user)
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
   },
+  //     .then((user) =>
+  //       !user
+  //         ? res
+  //           .status(404)
+  //           .json({ message: 'No user found with that ID :(' })
+  //         : res.json(user)
+  //     )
+  //     .catch((err) => res.status(500).json(err));
+  // },
 
 
   // create a new user
@@ -74,7 +82,7 @@ module.exports = {
       .then((Thought) =>
         !Thought
           ? res.status(404).json({
-            message: 'User deleted, but no Thoughts found',
+            message: 'User deleted',
           })
           : res.json({ message: 'User successfully deleted' })
       )
